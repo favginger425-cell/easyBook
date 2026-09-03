@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@theme inline {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #fdfbf7;
+  --color-card-bg: #ffffff;
+  --color-ink: #2b2927;
+  --color-terracotta: #d96b43;
+  --color-sand: #efece6;
+  --color-whatsapp: #25d366;
+  --color-whatsapp-hover: #1ebe5b;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+:root {
+  color-scheme: light;
+  --background: #fdfbf7;
+  --foreground: #2b2927;
+  --card: #ffffff;
+  --card-foreground: #2b2927;
+  --popover: #ffffff;
+  --popover-foreground: #2b2927;
+  --primary: #d96b43;
+  --primary-foreground: #ffffff;
+  --secondary: #efece6;
+  --secondary-foreground: #2b2927;
+  --muted: #efece6;
+  --muted-foreground: #78716c;
+  --accent: #efece6;
+  --accent-foreground: #2b2927;
+  --destructive: #dc2626;
+  --border: #efece6;
+  --input: #efece6;
+  --ring: #d96b43;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* thin, hidden scrollbar for horizontal pill strips */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
