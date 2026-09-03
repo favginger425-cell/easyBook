@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyBook - El Jadida</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- BARRE DE NAVIGATION (PUBLIC : MODE LECTEUR SEULEMENT) -->
+    <header class="bg-indigo-600 text-white shadow-md p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 id="site-header-title" class="text-2xl font-bold tracking-wide">EasyBook 📚</h1>
+                <p id="site-header-subtitle" class="text-xs text-indigo-200">📍 Service disponible exclusivement à <strong>El Jadida</strong></p>
+            </div>
+            <!-- SEUL BOUTON AUTORISÉ POUR LES VISITEURS -->
+            <a id="whatsapp-sell-btn" href="#" target="_blank" 
+               class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow transition flex items-center gap-2">
+                💬 Vendre mes livres
+            </a>
+        </div>
+    </header>
+
+    <!-- PAGE PRINCIPALE (PUBLIC) -->
+    <main id="public-view" class="max-w-6xl mx-auto p-6 w-full flex-grow">
+        <!-- BANNIÈRE D'ACCUEIL -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100 text-center">
+            <h2 id="banner-title" class="text-3xl font-extrabold text-gray-900 mb-2">Achetez et revendez vos manuels à El Jadida</h2>
+            <p id="banner-subtitle" class="text-gray-600">Bac, CPGE, Prépa & Scolaire au meilleur prix d'étudiant.</p>
+        </div>
+
+        <!-- CATALOGUE DES LIVRES EN MODE LECTEUR -->
+        <h3 class="text-xl font-bold mb-4 text-gray-800">Livres Disponibles</h3>
+        <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Injecté dynamiquement par JavaScript -->
+        </div>
+    </main>
+
+    <!-- SECTION ÉDITEUR PROTÉGÉE (#admin) -->
+    <section id="admin-view" class="hidden max-w-4xl mx-auto p-6 w-full bg-white rounded-xl shadow-md my-8 border">
+        
+        <!-- MOT DE PASSE CADENAS -->
+        <div id="admin-login" class="text-center py-8">
+            <div class="text-4xl mb-3">🔒</div>
+            <h2 class="text-2xl font-bold mb-2">Espace Éditeur Privé</h2>
+            <p class="text-gray-500 text-sm mb-4">Entrez votre mot de passe pour modifier le site et gérer le stock</p>
+            <div class="flex justify-center items-center gap-2">
+                <input type="password" id="admin-pass" placeholder="Mot de passe" class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button onclick="checkAdminPass()" class="bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700">Déverrouiller</button>
+            </div>
+            <p id="login-error" class="text-red-500 text-sm mt-2 hidden">Mot de passe incorrect !</p>
+        </div>
+
+        <!-- PANNEAU DE MODIFICATION (Accessible uniquement avec 7894) -->
+        <div id="admin-panel" class="hidden">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">Panneau de Contrôle Éditeur</h2>
+                <button onclick="logoutAdmin()" class="text-sm bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded">Fermer l'Admin</button>
+            </div>
+
+            <!-- COMPTEUR DE VISITES SEULEMENT POUR L'ÉDITEUR -->
+            <div class="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100 flex items-center justify-between">
+                <div>
+                    <span class="text-sm text-indigo-700 font-semibold">Statistiques des visiteurs :</span>
+                    <h4 class="text-2xl font-black text-indigo-900"><span id="visit-count">0</span> Visites</h4>
+                </div>
+                <span class="text-xs bg-indigo-200 text-indigo-800 px-2 py-1 rounded font-bold">Visible uniquement par vous</span>
+            </div>
+
+            <!-- OPTION DE MODIFICATION DES TEXTES DU SITE -->
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border">
+                <h3 class="font-bold mb-3 text-indigo-700">✏️ Modifier les Textes et Sous-titres du site</h3>
+                <form onsubmit="saveSiteSettings(event)" class="space-y-3">
+                    <div>
+                        <label class="text-xs font-bold text-gray-600">Titre de la Bannière :</label>
+                        <input type="text" id="edit-banner-title" class="border p-2 rounded w-full">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-600">Sous-titre / Description :</label>
+                        <input type="text" id="edit-banner-subtitle" class="border p-2 rounded w-full">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-600">Numéro WhatsApp Business (sans espace) :</label>
+                        <input type="text" id="edit-phone" class="border p-2 rounded w-full">
+                    </div>
+                    <button type="submit" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded hover:bg-indigo-700">Enregistrer les textes</button>
+                </form>
+            </div>
+
+            <!-- AJOUT D'UN LIVRE -->
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border">
+                <h3 class="font-bold mb-3 text-indigo-700">📚 Poser un livre à vendre</h3>
+                <form id="add-book-form" onsubmit="addBook(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="book-title" placeholder="Titre du livre" required class="border p-2 rounded">
+                    <input type="text" id="book-level" placeholder="Niveau (ex: 2ème Bac / Prépa)" required class="border p-2 rounded">
+                    <input type="number" id="book-price" placeholder="Prix (en DH)" required class="border p-2 rounded">
+                    <input type="text" id="book-image" placeholder="Lien de l'image (URL) ou laisser vide" class="border p-2 rounded">
+                    <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded">Ajouter au catalogue</button>
+                </form>
+            </div>
+
+            <!-- GESTION ET SUPPRESSION DES LIVRES -->
+            <h3 class="font-bold mb-3">Gérer le stock en ligne</h3>
+            <div id="admin-books-list" class="space-y-3"></div>
+        </div>
+    </section>
+
+    <!-- PIED DE PAGE AVEC CADENAS CACHÉ -->
+    <footer class="bg-gray-800 text-gray-400 p-6 text-center text-sm border-t mt-auto">
+        <p>© EasyBook El Jadida - Vente de livres d'occasion entre étudiants.</p>
+        <!-- LE BOUTON CADENAS : Seul moyen pour toi d'ouvrir l'Espace Éditeur -->
+        <a href="#admin" onclick="showAdminView()" class="text-gray-500 hover:text-gray-300 text-xs mt-2 inline-block transition">🔒 Mode Éditeur</a>
+    </footer>
+
+    <!-- CODE JS -->
+    <script>
+        // MOT DE PASSE ET NUMÉRO CONFIGURÉS
+        const ADMIN_PASSWORD = "7894";
+
+        let config = JSON.parse(localStorage.getItem('easybook_config')) || {
+            phone: "212716326545",
+            bannerTitle: "Achetez et revendez vos manuels à El Jadida",
+            bannerSubtitle: "Bac, CPGE, Prépa & Scolaire au meilleur prix d'étudiant."
+        };
+
+        let books = JSON.parse(localStorage.getItem('easybook_items')) || [
+            { id: 1, title: "Mathématiques CPGE", level: "Prépa", price: 120, status: "Disponible", image: "https://via.placeholder.com/150" }
+        ];
+
+        // COMPTEUR PRIVÉ DE VISITES
+        let visits = parseInt(localStorage.getItem('easybook_visits') || '0') + 1;
+        localStorage.setItem('easybook_visits', visits);
+        document.getElementById('visit-count').innerText = visits;
+
+        // METTRE À JOUR L'AFFICHAGE DU SITE PUBLIC
+        function updateUI() {
+            document.getElementById('banner-title').innerText = config.bannerTitle;
+            document.getElementById('banner-subtitle').innerText = config.bannerSubtitle;
+            document.getElementById('whatsapp-sell-btn').href = `https://wa.me/${config.phone}?text=Bonjour,%20je%20souhaite%20vendre%20mes%20livres%20sur%20EasyBook%20El%20Jadida`;
+
+            document.getElementById('edit-banner-title').value = config.bannerTitle;
+            document.getElementById('edit-banner-subtitle').value = config.bannerSubtitle;
+            document.getElementById('edit-phone').value = config.phone;
+
+            renderPublicBooks();
+        }
+
+        function renderPublicBooks() {
+            const grid = document.getElementById('books-grid');
+            grid.innerHTML = '';
+            
+            books.forEach(book => {
+                const isSold = book.status === 'VENDU';
+                grid.innerHTML += `
+                    <div class="bg-white rounded-lg shadow-sm border p-4 flex flex-col justify-between relative">
+                        <span class="absolute top-2 right-2 ${isSold ? 'bg-red-500' : 'bg-green-500'} text-white text-xs px-2 py-1 rounded font-bold">${book.status}</span>
+                        <img src="${book.image || 'https://via.placeholder.com/150'}" alt="${book.title}" class="h-40 object-contain mb-3 rounded">
+                        <div>
+                            <span class="text-xs text-indigo-600 font-semibold">${book.level}</span>
+                            <h4 class="font-bold text-gray-800">${book.title}</h4>
+                            <p class="text-lg font-black text-gray-900 my-2">${book.price} DH</p>
+                        </div>
+                        <a href="https://wa.me/${config.phone}?text=Bonjour,%20je%20suis%20intéressé(e)%20par%20le%20livre:%20${encodeURIComponent(book.title)}" 
+                           target="_blank" 
+                           class="mt-3 text-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2 rounded text-sm transition">
+                           Acheter via WhatsApp
+                        </a>
+                    </div>
+                `;
+            });
+        }
+
+        // ESPACE CADENAS / ADMIN
+        function showAdminView() {
+            document.getElementById('public-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+        }
+
+        function checkAdminPass() {
+            if(document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('login-error').classList.add('hidden');
+                renderAdminBooks();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('admin-login').classList.remove('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('public-view').classList.remove('hidden');
+        }
+
+        function saveSiteSettings(e) {
+            e.preventDefault();
+            config.bannerTitle = document.getElementById('edit-banner-title').value;
+            config.bannerSubtitle = document.getElementById('edit-banner-subtitle').value;
+            config.phone = document.getElementById('edit-phone').value;
+            localStorage.setItem('easybook_config', JSON.stringify(config));
+            updateUI();
+            alert("Les sous-titres et informations du site ont été mis à jour !");
+        }
+
+        function renderAdminBooks() {
+            const list = document.getElementById('admin-books-list');
+            list.innerHTML = '';
+            books.forEach(book => {
+                list.innerHTML += `
+                    <div class="flex items-center justify-between border p-3 rounded bg-white">
+                        <div><strong>${book.title}</strong> (${book.price} DH) - <span class="text-xs text-gray-500">${book.status}</span></div>
+                        <div class="flex gap-2">
+                            <button onclick="toggleStatus(${book.id})" class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-bold">Changer Statut</button>
+                            <button onclick="deleteBook(${book.id})" class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded font-bold">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addBook(e) {
+            e.preventDefault();
+            books.push({
+                id: Date.now(),
+                title: document.getElementById('book-title').value,
+                level: document.getElementById('book-level').value,
+                price: document.getElementById('book-price').value,
+                image: document.getElementById('book-image').value || 'https://via.placeholder.com/150',
+                status: 'Disponible'
+            });
+            saveAndRefresh();
+            document.getElementById('add-book-form').reset();
+        }
+
+        function toggleStatus(id) {
+            books = books.map(b => b.id === id ? {...b, status: b.status === 'Disponible' ? 'VENDU' : 'Disponible'} : b);
+            saveAndRefresh();
+        }
+
+        function deleteBook(id) {
+            books = books.filter(b => b.id !== id);
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('easybook_items', JSON.stringify(books));
+            renderPublicBooks();
+            renderAdminBooks();
+        }
+
+        // DEMARRAGE
+        updateUI();
+    </script>
+</body>
+</html>
